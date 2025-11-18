@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using NZWalks.API.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Injecting Db Context into server
+builder.Services.AddDbContext<NZWalksDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("NZWalksConnectionString")));
 
 var app = builder.Build();
 
@@ -24,7 +31,7 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
+    var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
@@ -37,7 +44,7 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-app.MapControllers();  
+app.MapControllers();
 
 app.Run();
 
