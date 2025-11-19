@@ -67,5 +67,67 @@ namespace MyApi.Controllers
             return Ok(regionDto);
 
         }
+
+        [HttpPost]
+
+        public IActionResult CreateNewRegion([FromBody] AddRegionRequestDto addRegionRequestDto)
+        {
+            // Map DTO to domain model
+            var regionDomainModel = new Region
+            {
+                Code = addRegionRequestDto.Code,
+                Name = addRegionRequestDto.Name,
+                RegionImageUrl = addRegionRequestDto.RegionImageUrl
+            };
+
+            // Use Domain model to create Region
+
+            dbContext.Regions.Add(regionDomainModel);
+            dbContext.SaveChanges();
+
+            // map domain model to dto
+
+            var regionDto = new RegionDto
+            {
+                Id = regionDomainModel.Id,
+                Code = regionDomainModel.Code,
+                Name = regionDomainModel.Name,
+                RegionImageUrl = regionDomainModel.RegionImageUrl,
+            };
+
+            return CreatedAtAction(nameof(GetRegionById), new { id = regionDto.Id }, regionDto);
+        }
+
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public IActionResult UpdateRegion([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
+        {
+            var regionDomainModel = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+
+            if (regionDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            // mpa Dto to  domain model
+
+            regionDomainModel.Code = updateRegionRequestDto.Code;
+            regionDomainModel.Name = updateRegionRequestDto.Name;
+            regionDomainModel.RegionImageUrl = updateRegionRequestDto.RegionImageUrl;
+
+            dbContext.SaveChanges();
+
+            // convert domain model to dto
+
+            var regionDto = new RegionDto
+            {
+                Code = regionDomainModel.Code,
+                Name = regionDomainModel.Name,
+                RegionImageUrl = regionDomainModel.RegionImageUrl,
+            };
+
+
+            return Ok(regionDto);
+        }
     }
 }
