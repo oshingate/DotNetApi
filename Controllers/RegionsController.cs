@@ -129,5 +129,38 @@ namespace MyApi.Controllers
 
             return Ok(regionDto);
         }
+
+        [HttpDelete]
+        [Route("{id:Guid}")]
+
+        public IActionResult DeleteRegion([FromRoute] Guid id)
+        {
+            var regionDomain = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+
+            if (regionDomain == null)
+            {
+                return NotFound();
+            }
+
+            // Delete region
+
+            dbContext.Regions.Remove(regionDomain);
+            dbContext.SaveChanges();
+
+            // convert domain model to dto
+
+            var regionDto = new RegionDto
+            {
+                Id = regionDomain.Id,
+                Code = regionDomain.Code,
+                Name = regionDomain.Name,
+                RegionImageUrl = regionDomain.RegionImageUrl,
+            };
+
+
+            return Ok(regionDto);
+
+
+        }
     }
 }
