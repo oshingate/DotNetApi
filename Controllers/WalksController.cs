@@ -38,10 +38,11 @@ namespace MyApi.Controllers
         }
 
         // Get all walks
+        // GET:- / api/walks?filterOn=Name?filterQuery=Track
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
         {
-            var walks = await walkRepository.GetAllAsync();
+            var walks = await walkRepository.GetAllAsync(filterOn, filterQuery);
 
             //map domain model to dto
 
