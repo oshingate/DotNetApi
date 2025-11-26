@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,25 +22,39 @@ namespace MyApi.Controllers
         private readonly NZWalksDbContext dbContext;
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
+        private readonly ILogger<RegionsController> logger;
 
-        public RegionsController(NZWalksDbContext dbContext, IRegionRepository regionRepository, IMapper mapper)
+        public RegionsController(NZWalksDbContext dbContext, IRegionRepository regionRepository, IMapper mapper, ILogger<RegionsController> logger)
         {
             this.dbContext = dbContext;
             this.regionRepository = regionRepository;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         [HttpGet]
-        [Authorize(Roles = "Reader")]
+        // [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAllRegions()
         {
+            try
+            {
+                logger.LogInformation("GetAllRegions method was invoked");
 
-            // var regionsDomain = await dbContext.Regions.ToListAsync();
-            var regionsDomain = await regionRepository.GetAllAsync();
 
-            var regionsDto = mapper.Map<List<RegionDto>>(regionsDomain);
+                var regionsDomain = await regionRepository.GetAllAsync();
 
-            return Ok(regionsDto);
+                logger.LogInformation($"Finished GetAllRegions method with data: {JsonSerializer.Serialize(regionsDomain)}");
+
+                var regionsDto = mapper.Map<List<RegionDto>>(regionsDomain);
+
+                return Ok(regionsDto);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                throw;
+            }
+
         }
 
         [HttpGet]
