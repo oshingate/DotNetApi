@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NZWalks.API.Data;
 using NZWalks.API.Mappings;
+using NZWalks.API.Middleware;
 using NZWalks.API.Repositories;
 using Serilog;
 
@@ -101,12 +102,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 app.UseHttpsRedirection();
 
@@ -131,7 +136,6 @@ app.MapGet("/weatherforecast", () =>
 .WithOpenApi();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();
